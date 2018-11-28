@@ -7,14 +7,6 @@
   </span>
 </template>
 
-<script>
-import { coreComponent } from 'core/lib/themes'
-
-export default {
-  mixins: [coreComponent('SizeButton')]
-}
-</script>
-
 <style lang="scss" scoped>
 @import '~theme/css/variables/colors';
 @import '~theme/css/helpers/functions/color';

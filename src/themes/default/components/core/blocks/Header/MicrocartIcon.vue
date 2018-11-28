@@ -1,21 +1,28 @@
 <template>
-  <div class="relative inline-flex" @click="openMicrocart">
-    <i class="material-icons md-18">shopping_cart</i>
+  <button
+    type="button"
+    class="relative bg-cl-transparent brdr-none inline-flex"
+    @click="openMicrocart"
+    data-testid="openMicrocart"
+    :aria-label="$t('Open microcart')"
+  >
+    <i class="material-icons">shopping_cart</i>
     <span
       class="minicart-count absolute flex center-xs middle-xs border-box py0 px2 h6 lh16 weight-700 cl-white bg-cl-silver"
       v-cloak
       v-if="totalQuantity"
+      data-testid="minicartCount"
     >
       {{ totalQuantity }}
     </span>
-  </div>
+  </button>
 </template>
 
 <script>
-import { coreComponent } from 'core/lib/themes'
+import MicrocartIcon from '@vue-storefront/core/components/blocks/Header/MicrocartIcon'
 
 export default {
-  mixins: [coreComponent('blocks/Header/MicrocartIcon')]
+  mixins: [MicrocartIcon]
 }
 </script>
 

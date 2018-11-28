@@ -72,5 +72,4 @@ const EventBusPlugin = {
     }
   }
 }
-
 export { EventBus as default, EventBusPlugin }

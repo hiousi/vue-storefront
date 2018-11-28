@@ -5,10 +5,8 @@ const MFS = require('memory-fs')
 let baseClientConfig = require('./webpack.client.config')
 let baseServerConfig = require('./webpack.server.config')
 
-const theme = require('../build/config.json').theme
-const themeRoot = '../../src/themes/' + theme + '/'
-
-let extendedConfig = require(path.join(themeRoot, 'webpack.config.js'))
+const themeRoot = require('./theme-path')
+const extendedConfig = require(path.join(themeRoot, '/webpack.config.js'))
 
 let clientConfig = extendedConfig(baseClientConfig, { isClient: true, isDev: true })
 let serverConfig = extendedConfig(baseServerConfig, { isClient: false, isDev: true })
@@ -18,17 +16,6 @@ module.exports = function setupDevServer (app, cb) {
   let template
 
   // modify client config to work with hot middleware
-
-  if(!clientConfig.hasOwnProperty('entry')) // multicompiler
-  {
-    for(let cc of clientConfig)
-    if(cc.hasOwnProperty('entry') && cc.entry.hasOwnProperty('app'))
-      {
-        clientConfig = cc;
-        break;
-      }
-    }
-
   clientConfig.entry.app = ['webpack-hot-middleware/client', clientConfig.entry.app]
   clientConfig.output.filename = '[name].js'
   clientConfig.plugins.push(

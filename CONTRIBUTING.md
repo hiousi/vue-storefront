@@ -9,6 +9,16 @@ Before you type an issue please check:
 
 Main readme - https://github.com/DivanteLtd/vue-storefront/blob/master/README.md
 
+# Branches
+
+You should fork the project or create branch for new features.
+The main branches used by the core team are:
+
+- master - where we store the stable release of the app (that can be deployed to our demo instances),
+- develop - the most recent version of the app - kind of "nightly" build.
+
+Please use "develop" for development purposes as the "master" can be merged just as the new release is coming out (about once a month)!
+
 ## Issue reporting guidelines:
 
 Always define type of issue:
@@ -19,26 +29,30 @@ While writing issues, be as specific as possible
 All requests regarding support with implementation or application setup should be sent to contributors@vuestorefront.io
 
 If the issue is about some changes with particular theme prefix the issue with theme name (ex. "[default] change product tile background color" )
+
+## TypeScript?
+
+We're introducing TypeScript to Vue Storefront core, so You can use it where it's aproprierate - but please be pragmatic.
+Here are some thoughts on how to use TS features in Vue Storefront: [TypeScript Action Plan](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/TypeScript%20Action%20Plan.md).
+
 ## Pull request checklist
 
-Here’s how to submit a pull request:
+Here’s how to submit a pull request. <b>Pull request that dont meet this requirements will not be merged.</b>
 
-1. Fork the repository and clone it locally. Connect your local repository to the original “upstream” repository by adding it as a remote repository. Pull in changes from “upstream” often in order to stay up to date so that when you submit your pull request, merge conflicts will be less likely.
+**ALWAYS** use [Pull Request template](https://github.com/DivanteLtd/vue-storefront/blob/master/PULL_REQUEST_TEMPLATE.md) it's automatically added to each PR.
+1. Fork the repository and clone it locally fro the 'develop' branch. Make sure its up to date with current `develop` branch
 2. Create a branch for your edits. Use the following branch naming conventions:
  * bugfix/task-title
  * feature/task-name
-3. Reference any relevant issues or supporting documentation in your PR (ex. “Issue: 39. Issue title.”).
-4. Test your changes! Run your changes against any existing tests and create new ones when needed. Make sure your changes don’t break the existing project.
-5. Make sure that your pull request also meets the case-specific requirements listed below.
-6. If you have found a potential security vulnerability, please DO NOT report it on the public issue tracker. Instead, send it to us at contributors@vuestorefront.io. We will work with you to verify and fix it as soon as possible.
+3. Describe what you've changed. Include screenshots of the new feature or the before and after if your changes include differences in HTML/CSS. Drag and drop the images into the body of your pull request.
+4. Reference any relevant issues or supporting documentation in your PR (ex. “Issue: 39. Issue title.”).
+5. If you are adding new feature provide documentation along with the PR. Also add it to [upgrade notes](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Upgrade%20notes.md)
+6. If you are removing/renaming something or changing it's behavior also include it in [upgrade notes](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Upgrade%20notes.md)
+7. Test your changes! Run your changes against any existing tests and create new ones when needed. Make sure your changes don’t break the existing project. Make sure that your branch is passing Travis CI build. 
+8. If you have found a potential security vulnerability, please DO NOT report it on the public issue tracker. Instead, send it to us at contributors@vuestorefront.io. We will work with you to verify and fix it as soon as possible.
+(https://github.com/DivanteLtd/vue-storefront/blob/master/README.md#documentation--table-of-contents))
 
-### Visual changes/new features
+## New features
 
-1. Be sure that you are following all theme conventions (you can find most of them linked in [README](https://github.com/DivanteLtd/vue-storefront/blob/master/README.md#documentation--table-of-contents))
-2. Include screenshots of the new feature or the before and after if your changes include differences in HTML/CSS. Drag and drop the images into the body of your pull request.
+If you are making any new feature make sure it's adjusted to our new, modular approach. Read more [here](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/api-modules/about-modules.md)
 
-### New core components
-
-1. Each new core component should be properly docummented (create docs file with PR). If the component should be accesible via mixin you should specify the public data and methods that will be available in the theme components using this mixin. Before creating the docs taka a look at other core components guideness and try to do something similar (see it [here](https://github.com/DivanteLtd/vue-storefront/tree/master/doc/components))
-2. Core components shouldn't provide any html/css. The exception is when the component's behavior depends on css (for example Modal component)
-3. Read [Working with components](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/components/Working%20with%20components.md) guideness before creating new component.

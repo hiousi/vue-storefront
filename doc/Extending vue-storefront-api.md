@@ -32,7 +32,7 @@ module.exports = ({ config, db }) => {
 		
 		let request = require('request');
 		request({
-			url: config.extensions.mailchimp.apiUrl + '/lists/' + config.extensions.mailchimp.listId + '/members',
+			url: config.extensions.mailchimp.apiUrl + '/lists/' + encodeURIComponent(config.extensions.mailchimp.listId) + '/members',
 			method: 'POST',
 			headers: { 'Authorization': 'apikey ' + config.extensions.mailchimp.apiKey },
 			json: true,
@@ -59,7 +59,7 @@ module.exports = ({ config, db }) => {
 		
 		let request = require('request');
 		request({
-			url: config.extensions.mailchimp.apiUrl + '/lists/' + config.extensions.mailchimp.listId,
+			url: config.extensions.mailchimp.apiUrl + '/lists/' + encodeURIComponent(config.extensions.mailchimp.listId),
 			method: 'POST',
 			headers: { 'Authorization': 'apikey ' + config.extensions.mailchimp.apiKey },
 			json: true,
@@ -83,5 +83,5 @@ module.exports = ({ config, db }) => {
 ```
 
 4. Restart the `vue-storefront-api`
-5. Youe new API method is available on `localhost:8080/api/ext/<extension_name>/<extension_method>` for example: `localhost:8080/api/ext/mailchimp-subscribe/subscribe`
+5. Your new API method is available on `localhost:8080/api/ext/<extension_name>/<extension_method>` for example: `localhost:8080/api/ext/mailchimp-subscribe/subscribe`
 

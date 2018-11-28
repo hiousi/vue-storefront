@@ -1,6 +1,6 @@
 # Themes in Vue Storefront
 
-Vue Storefront allows you to quickly develop your own themes and use our core business logic. All ecommerce features are implemented in core so you can easly develop fully working online shop only by writing HTML and CSS and inheriting the business logic from core. Of course you can easly modify and extend the core logic in your theme.
+Vue Storefront allows you to quickly develop your own themes and use our core business logic. All ecommerce features are implemented in core so you can easily develop fully working online shop only by writing HTML and CSS and inheriting the business logic from the core. Of course, you can easily modify and extend the core logic in your theme.
 
 You can read more about Vue Storefront core components and how to make use of them [here](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/components/Working%20with%20components.md)
 
@@ -8,31 +8,40 @@ All themes are located in `src/themes` folder and you can think about them as a 
 
 ## Switching themes
 
-To use any of the themes located in `src/themes` just change the `theme` property in your config file to folder name of the theme that you want to use. The config files are located in `config` folder. You shouldn't make changes in `config/default.json`. Instead just copy the `default.json` file to the same folder, name it `local.json` and make changes here.
+To use any of the themes located in `src/themes` just change the `theme` property in your config file to `name` property from package.json file sitting in your theme's root dir. The config files are located in `config` folder. You shouldn't make changes in `config/default.json`. Instead just copy the default.json file to the same folder, name it `local.json` and make changes there.
 
 ## Creating your own themes
 
-To create your own theme just copy the `theme-starter` folder (it contains all files needed for new theme) located in `src/themes` and change it's name to your new theme's name. Now you can start development of your own theme for Vue Storefront!
+There are two ways of creating your own VS theme
+1. Copying and modifying the default theme which is fully-styled and ready to work out of the box (it's the one that you can find on our demo)
+2. Copying and modifying theme-starter which contains only data and no styling. It requires more work to have it production-ready (you need to style it from scratch) but if your designs are much different than our default theme you'd probably want to start with this one.
 
-Only official themes tested and accepted by the community should be in a `master` branch. Please develop your own themes on separate branches and keep them updated wih `master` to be sure it works with the newest core.
+To create your own theme just copy the `theme-starter` or `default` folder located in `src/themes` and change it's name to your new theme's name. Next change the name property in your theme's package.json file. You can use this name in your config file to change the active theme. After adding new theme you need to run `yarn install` so lerma can detect new theme. Now you can start development of your own theme for Vue Storefront! 
+
+Only official themes tested and accepted by the community should be in a `master` branch. Please develop your own themes on separate branches and keep them updated with `master` to be sure it works with the newest core.
 
 ## Important theme files
 
-Each theme is a separate Vue.js application with it's own dependencys which can make use of the core and even modify it.
-Below you can find list of files that are essential for your theme to work:
-
+Each theme is a separate Vue.js application with its own dependencies, which can make use of the core or even modify it.
+Below you can find the list of files that are essential for your theme to work:
+* `extensions` - theme-specific extension (see [Working with extensions](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/extensions/Working%20with%20extensions.md))
+  * `index.js` - here you can register your theme-specific extensions
 * `filters` - theme-specific filters (extends `core/filters`)
   * `index.js` - here you can register your theme-specific filters
-* `mixins` - theme-specific mixins (extends `core/mixins`
+* `mixins` - theme-specific mixins (extends `core/mixins`)
   * `index.js` - here you can register your theme-specific mixins
 * `pages` - your shop pages
 * `plugins` - theme-specific plugins (extends `core/plugins`, see [Working with plugins](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Working%20with%20plugins.md)
-* `resoource` - theme-specific resources (extends `core/resorce`)
-* `app-extend.js` - The code inside this file will be executed in app's entry file just after registering core plugins, filters and mixins. It takes app's Vue instance as a param so you can make use of it. (extends `core/app.js`)
+* `resource` - theme-specific resources (extends `core/resource`)
+* `router` - theme router
+* `store` - theme-specific stores (extends `core/store`)
+  * `ui-store.js` - here you can extend core `ui-store`
+  * `index.js` -  here you can register theme-specific stores
 * `App.vue` - theme's entry component
-* `index.js` - theme's routes
-* `package.json` - theme-specific dependencys
-* `service-worker-ext.js` - you can extend core service worker here (see [Working with Service Workers](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Working%20with%20service-worker.md)
+* `index.js` - theme initialization
+* `package.json` - theme-specific dependencies
+* `service-worker` 
+  * `index.js` you can extend core service worker here (see [Working with Service Workers](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Working%20with%20service-worker.md)
 * `webpack.config.js` - you can extend core webpack build in this file (extends `core/build/`, see [Working with webpack](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Working%20with%20webpack.md))
 
 ## Official Vue Storefront themes included with the template:

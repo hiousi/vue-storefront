@@ -10,18 +10,12 @@ export function slugify (text) {
     .replace(/--+/g, '-') // Replace multiple - with single -
 }
 
-/**
- * Re-format category path to be suitable for breadcrumb
- * @param {Array} categoryPath
- */
-export function breadCrumbRoutes (categoryPath) {
-  const tmpRts = []
-  for (let sc of categoryPath) {
-    tmpRts.push({
-      name: sc.name,
-      route_link: '/c/' + sc.slug
-    })
+export function once (key, fn) {
+  const { process = {} } = global
+  const processKey = key + '__ONCE__'
+  if (!process.hasOwnProperty(processKey)) {
+    console.debug(`Once ${key}`)
+    process[processKey] = true
+    fn()
   }
-
-  return tmpRts
 }

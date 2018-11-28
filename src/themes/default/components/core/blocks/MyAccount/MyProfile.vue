@@ -1,14 +1,14 @@
 <template>
-  <div class="my-profile mb35">
+  <div class="mb35">
     <!-- My profile header -->
     <div class="row mb15">
-      <div class="col-xs-12 col-md-6" :class="{ 'cl-accent' : !isActive }">
+      <div class="col-xs-12 col-sm-6" :class="{ 'cl-accent' : !isEdited }">
         <h3 class="m0 mb5">
           {{ $t('My profile') }}
         </h3>
       </div>
-      <div class="col-xs-12 col-md-6 pr30">
-        <div class="lh30 flex end-md" v-if="!isActive && editMode">
+      <div class="col-xs-12 col-sm-6">
+        <div class="lh30 flex end-md" v-if="!isEdited">
           <a href="#" class="cl-tertiary flex" @click.prevent="edit">
             <span class="pr5">
               {{ $t('Edit your profile') }}
@@ -18,268 +18,378 @@
         </div>
       </div>
     </div>
-    <!-- My profile body (edit mode) -->
-    <div class="row" v-show="isActive">
-      <div class="col-xs-12 col-sm-12 col-md-6 mb25">
-        <input
-          type="text"
-          name="first-name"
-          :placeholder="$t('First name')"
-          v-model.trim="currentUser.firstname"
-          @input="$v.currentUser.firstname.$touch()"
-        >
-        <span
-          class="validation-error"
-          v-if="!$v.currentUser.firstname.required"
-        >
-          {{ $t('Field is required') }}
-        </span>
-        <span class="validation-error" v-if="!$v.currentUser.firstname.minLength">
-          {{ $t('Name must have at least 3 letters.') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 mb25">
-        <input type="text" name="last-name" :placeholder="$t('Last name')" v-model.trim="currentUser.lastname">
-        <span class="validation-error" v-if="!$v.currentUser.lastname.required">
-          {{ $t('Field is required') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 mb25">
-        <input type="email" name="email-address" :placeholder="$t('Email address')" v-model="currentUser.email">
-        <span class="validation-error" v-if="!$v.currentUser.email.required">
-          {{ $t('Field is required') }}
-        </span>
-        <span class="validation-error" v-if="!$v.currentUser.email.email">
-          {{ $t('Please provide valid e-mail address.') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-md-12 mb15">
-        <div class="checkboxStyled">
-          <input type="checkbox" v-model="changePassword" id="changePassword">
-          <label for="changePassword"/>
-        </div>
-        <div class="checkboxText ml15 lh25" @click="changePassword = !changePassword">
-          <span class="fs16 cl-accent">
-            {{ $t('Change my password') }}
-          </span>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 mb15 mt10" v-if="changePassword">
-        <div class="pass-container relative mr35">
-          <input
-            class="w-100 pr30 py10 border-box brdr-none brdr-bottom brdr-cl-primary h4"
-            name="old-password"
-            v-model="oldPassword"
-            :type="passType.oldPass"
-            :placeholder="$t('Current password *')"
-            @input="$v.oldPassword.$touch()"
-          >
-          <div class="icon absolute cl-tertiary pointer">
-            <i class="material-icons" @click="togglePassType('oldPass')">{{ iconName.oldPass }}</i>
-          </div>
-        </div>
-        <span class="validation-error" v-if="!$v.oldPassword.required && $v.oldPassword.$error">
-          {{ $t('Field is required.') }}
-        </span>
-      </div>
-      <div class="hidden-xs hidden-sm col-md-6 mb15 mt10" v-if="changePassword"/>
-      <div class="col-xs-12 col-sm-12 col-md-6 mb15 mt10" v-if="changePassword">
-        <div class="pass-container relative mr35">
-          <input
-            class="w-100 pr30 py10 border-box brdr-none brdr-bottom brdr-cl-primary h4"
-            name="password"
-            v-model="password"
-            :type="passType.pass"
-            :placeholder="$t('New password *')"
-            @input="$v.password.$touch()"
-          >
-          <div class="icon absolute cl-tertiary pointer">
-            <i class="material-icons" @click="togglePassType('pass')">{{ iconName.pass }}</i>
-          </div>
-        </div>
-        <span class="validation-error" v-if="!$v.password.required && $v.password.$error">
-          {{ $t('Field is required.') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 mb15 mt10" v-if="changePassword">
-        <div class="pass-container relative mr35">
-          <input
-            class="w-100 pr30 py10 border-box brdr-none brdr-bottom brdr-cl-primary h4"
-            name="password-confirm"
-            v-model="rPassword"
-            :type="passType.repeatPass"
-            :placeholder="$t('Repeat new password *')"
-          >
-          <i
-            class="icon absolute cl-tertiary material-icons pointer"
-            @click="togglePassType('repeatPass')"
-          >
-            {{ iconName.repeatPass }}
-          </i>
-        </div>
-        <span class="validation-error" v-if="!$v.rPassword.sameAsPassword">
-          {{ $t('Passwords must be identical.') }}
-        </span>
-      </div>
-      <!-- Company information -->
-      <div class="col-xs-12 col-md-12 mb25 mt10">
-        <div class="checkboxStyled">
-          <input type="checkbox" v-model="addCompany" id="addCompany">
-          <label for="addCompany"/>
-        </div>
-        <div class="checkboxText ml15 lh25" @click="addCompany = !addCompany">
-          <span class="fs16 cl-accent">
-            {{ $t('I have a company and want to receive an invoice for every order') }}
-          </span>
-        </div>
-      </div>
 
-      <div class="col-xs-12 col-sm-12 mb25" v-show="addCompany">
-        <input
+    <!-- My profile body (edit mode) -->
+    <div class="row" v-if="isEdited">
+      <base-input
+        class="col-xs-12 col-md-6 mb25"
+        type="text"
+        name="first-name"
+        autocomplete="given-name"
+        :placeholder="$t('First name')"
+        v-model.trim="currentUser.firstname"
+        @input="$v.currentUser.firstname.$touch()"
+        :validations="[
+          {
+            condition: !$v.currentUser.firstname.required,
+            text: $t('Field is required')
+          },
+          {
+            condition: !$v.currentUser.firstname.minLength,
+            text: $t('Name must have at least 3 letters.')
+          }
+        ]"
+      />
+
+      <base-input
+        class="col-xs-12 col-md-6 mb25"
+        type="text"
+        name="last-name"
+        autocomplete="family-name"
+        :placeholder="$t('Last name')"
+        v-model.trim="currentUser.lastname"
+        @input="$v.currentUser.lastname.$touch()"
+        :validation="{
+          condition: !$v.currentUser.lastname.required,
+          text: $t('Field is required')
+        }"
+      />
+
+      <base-input
+        class="col-xs-12 col-md-6 mb25"
+        type="email"
+        name="email-address"
+        autocomplete="email"
+        :placeholder="$t('Email address')"
+        v-model="currentUser.email"
+        :validations="[
+          {
+            condition: !$v.currentUser.email.required,
+            text: $t('Field is required')
+          },
+          {
+            condition: !$v.currentUser.email.email,
+            text: $t('Please provide valid e-mail address.')
+          }
+        ]"
+      />
+
+      <!-- Change password (edit mode) -->
+      <base-checkbox
+        class="col-xs-12 mb15"
+        id="changePassword"
+        v-model="changePassword"
+        @click="changePassword = !changePassword"
+      >
+        {{ $t('Change my password') }}
+      </base-checkbox>
+
+      <template v-if="changePassword">
+        <base-input
+          class="col-xs-12 col-md-6 mb15 mt10"
+          type="password"
+          name="old-password"
+          autocomplete="current-password"
+          :placeholder="$t('Current password *')"
+          v-model="oldPassword"
+          @input="$v.oldPassword.$touch()"
+          :validation="{
+            condition: !$v.oldPassword.required && $v.oldPassword.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <div class="hidden-xs hidden-sm col-md-6 mb15 mt10"/>
+
+        <base-input
+          class="col-xs-12 col-md-6 mb15 mt10"
+          type="password"
+          name="password"
+          autocomplete="new-password"
+          :placeholder="$t('New password *')"
+          v-model="password"
+          @input="$v.password.$touch()"
+          :validation="{
+            condition: !$v.password.required && $v.password.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <base-input
+          class="col-xs-12 col-md-6 mb15 mt10"
+          type="password"
+          name="password-confirm"
+          autocomplete="new-password"
+          :placeholder="$t('Repeat new password *')"
+          v-model="rPassword"
+          @input="$v.rPassword.$touch()"
+          :validations="[
+            {
+              condition: !$v.rPassword.required && $v.rPassword.$error,
+              text: $t('Field is required')
+            },
+            {
+              condition: !$v.rPassword.sameAsPassword,
+              text: $t('Passwords must be identical.')
+            }
+          ]"
+        />
+      </template>
+
+      <!-- Company information (edit mode) -->
+      <base-checkbox
+        class="col-xs-12 mb15 mt10"
+        id="addCompany"
+        v-model="addCompany"
+        @click="addCompany = !addCompany"
+      >
+        {{ $t('I have a company and want to receive an invoice for every order') }}
+      </base-checkbox>
+
+      <template v-if="addCompany">
+        <base-input
+          class="col-xs-12 mb25"
           type="text"
           name="company-name"
+          autocomplete="organization"
           :placeholder="$t('Company name *')"
           v-model.trim="userCompany.company"
           @input="$v.userCompany.company.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.company.required && $v.userCompany.company.$error">
-          {{ $t('Field is required') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input
+          :validation="{
+            condition: !$v.userCompany.company.required && $v.userCompany.company.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
           type="text"
           name="street-address"
+          autocomplete="address-line1"
           :placeholder="$t('Street name *')"
           v-model.trim="userCompany.street"
           @input="$v.userCompany.street.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.street.required && $v.userCompany.street.$error">
-          {{ $t('Field is required') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input
+          :validation="{
+            condition: !$v.userCompany.street.required && $v.userCompany.street.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
           type="text"
           name="apartment-number"
+          autocomplete="address-line2"
           :placeholder="$t('House/Apartment number *')"
           v-model.trim="userCompany.house"
           @input="$v.userCompany.house.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.house.required && $v.userCompany.house.$error">
-          {{ $t('Field is required') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input
+          :validation="{
+            condition: !$v.userCompany.house.required && $v.userCompany.house.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
           type="text"
           name="city"
+          autocomplete="address-level2"
           :placeholder="$t('City *')"
           v-model.trim="userCompany.city"
           @input="$v.userCompany.city.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.city.required && $v.userCompany.city.$error">
-          {{ $t('Field is required') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input type="text" name="state" placeholder="State / Province" v-model.trim="userCompany.region">
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input
+          :validation="{
+            condition: !$v.userCompany.city.required && $v.userCompany.city.$error,
+            text: $t('Field is required')
+          }"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
+          type="text"
+          name="state"
+          autocomplete="address-level1"
+          :placeholder="$t('State / Province')"
+          v-model.trim="userCompany.region"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
           type="text"
           name="zip-code"
+          autocomplete="postal-code"
           :placeholder="$t('Zip-code *')"
           v-model.trim="userCompany.postcode"
           @input="$v.userCompany.postcode.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.postcode.required && $v.userCompany.postcode.$error">{{ $t('Field is required') }}</span>
-        <span class="validation-error" v-if="!$v.userCompany.postcode.minLength">
-          {{ $t('Zip-code must have at least 3 letters.') }}
-        </span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <select
+          :validations="[
+            {
+              condition: !$v.userCompany.postcode.required && $v.userCompany.postcode.$error,
+              text: $t('Field is required')
+            },
+            {
+              condition: !$v.userCompany.postcode.minLength,
+              text: $t('Zip-code must have at least 3 letters.')
+            }
+          ]"
+        />
+
+        <base-select
+          class="col-xs-12 col-md-6 mb25"
           name="countries"
+          :options="countryOptions"
+          :selected="userCompany.country"
+          :placeholder="$t('Country *')"
+          :validations="[
+            {
+              condition: $v.userCompany.country.$error && !$v.userCompany.country.required,
+              text: $t('Field is required')
+            }
+          ]"
           v-model="userCompany.country"
-          :class="{'cl-tertiary' : userCompany.country.length === 0}"
-        >
-          <option value="" disabled selected hidden>Country *</option>
-          <option v-for="country in countries" :key="country.code" :value="country.code">{{ country.name }}</option>
-        </select>
-        <span class="validation-error" v-if="!$v.userCompany.country.required && $v.userCompany.country.$error">{{ $t('Field is required') }}</span>
-      </div>
-      <div class="col-xs-12 col-sm-6 mb25" v-show="addCompany">
-        <input
+          autocomplete="country-name"
+          @blur="$v.userCompany.country.$touch()"
+          @change="$v.userCompany.country.$touch()"
+        />
+
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
           type="text"
           name="taxId"
+          autocomplete="tax-id"
           :placeholder="$t('Tax ID *')"
           v-model.trim="userCompany.taxId"
           @input="$v.userCompany.taxId.$touch()"
-        >
-        <span class="validation-error" v-if="!$v.userCompany.taxId.required && $v.userCompany.taxId.$error">{{ $t('Field is required') }}</span>
-        <span class="validation-error" v-if="!$v.userCompany.taxId.minLength">
-          {{ $t('Tax ID must have at least 3 letters.') }}
-        </span>
-      </div>
-      <div class="hidden-xs col-sm-6 mb25" v-show="addCompany"/>
+          :validations="[
+            {
+              condition: !$v.userCompany.taxId.required && $v.userCompany.taxId.$error,
+              text: $t('Field is required')
+            },
+            {
+              condition: !$v.userCompany.taxId.minLength,
+              text: $t('Tax ID must have at least 3 letters.')
+            }
+          ]"
+        />
 
-      <div class="col-xs-12 col-sm-6 bottom-button">
+        <base-input
+          class="col-xs-12 col-sm-6 mb25"
+          type="text"
+          name="phone-number"
+          autocomplete="tel"
+          :placeholder="$t('Phone Number')"
+          v-model.trim="userCompany.phone"
+        />
+
+      </template>
+
+      <div class="col-xs-12 col-sm-6">
         <button-full
           @click.native="updateProfile"
-          :class="{ 'button-disabled': checkValidation() }"
+          :disabled="checkValidation()"
         >
           {{ $t('Update my profile') }}
         </button-full>
       </div>
-      <div class="col-xs-12 col-sm-6 pt15 bottom-button">
-        <a href="#" @click="exitSection" class="link no-underline fs16 cl-accent">
+      <div class="col-xs-12 col-sm-6 flex middle-xs py10">
+        <a href="#" @click="exitSection" class="h4 cl-accent">
           {{ $t('Cancel') }}
         </a>
       </div>
     </div>
 
-    <!-- The look when it's not in edit mode -->
-    <div class="row fs16 mb35" v-show="!isActive">
+    <!-- My profile summary -->
+    <div class="row fs16 mb35" v-else>
       <div class="col-xs-12 h4">
-        <p>{{ currentUser.firstname }} {{ currentUser.lastname }}</p>
         <p>
-          <span class="pr15">{{ currentUser.email }}</span>
+          {{ currentUser.firstname }} {{ currentUser.lastname }}
         </p>
-        <div class="mb25" v-show="addCompany">
-          <div class="checkboxStyled">
-            <input type="checkbox" v-model="addCompany" id="addCompanyFilled" disabled>
-            <label for="addCompanyFilled"/>
+        <p>
+          {{ currentUser.email }}
+        </p>
+        <base-checkbox
+          v-if="addCompany"
+          class="mb25"
+          id="addCompanyFilled"
+          v-model="addCompany"
+          disabled
+        >
+          {{ $t('I have a company and want to receive an invoice for every order') }}
+        </base-checkbox>
+        <template v-if="addCompany">
+          <p class="mb25">
+            {{ userCompany.company }}
+          </p>
+          <p class="mb25">
+            {{ userCompany.street }}
+            <span v-if="userCompany.house">
+              {{ userCompany.house }}
+            </span>
+          </p>
+          <p class="mb25">
+            {{ userCompany.city }} {{ userCompany.postcode }}
+          </p>
+          <p class="mb25">
+            <span v-if="userCompany.region">{{ userCompany.region }}, </span>
+            <span>
+              {{ getCountryName() }}
+            </span>
+          </p>
+          <p class="mb25" v-if="userCompany.taxId">
+            {{ userCompany.taxId }}
+          </p>
+          <div class="mb25">
+            {{ userCompany.phone }}
+            <tooltip v-if="userCompany.phone">
+              {{ $t('Phone number may be needed by carrier') }}
+            </tooltip>
           </div>
-          <div class="checkboxText ml15 lh25">
-            <span class="fs16 cl-accent">{{ $t('I have a company and want to receive an invoice for every order') }}</span>
-          </div>
-        </div>
-        <p class="mb25" v-show="addCompany">{{ userCompany.company }}</p>
-        <p class="mb25" v-show="addCompany">
-          {{ userCompany.street }}
-          <span v-show="userCompany.house"> {{ userCompany.house }}</span>
-        </p>
-        <p class="mb25" v-show="addCompany">{{ userCompany.city }} {{ userCompany.postcode }}</p>
-        <p class="mb25" v-show="addCompany">
-          <span v-show="userCompany.region">{{ userCompany.region }}, </span>
-          <span>{{ getCountryName() }}</span>
-        </p>
-        <p class="mb25" v-show="addCompany && userCompany.taxId">
-          {{ userCompany.taxId }}
-        </p>
+        </template>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import { coreComponent } from 'core/lib/themes'
 import { required, minLength, email, sameAs } from 'vuelidate/lib/validators'
-import ButtonFull from 'theme/components/theme/ButtonFull.vue'
+import MyProfile from '@vue-storefront/core/components/blocks/MyAccount/MyProfile'
+
+import BaseCheckbox from 'theme/components/core/blocks/Form/BaseCheckbox'
+import BaseSelect from 'theme/components/core/blocks/Form/BaseSelect'
+import BaseInput from 'theme/components/core/blocks/Form/BaseInput'
+import ButtonFull from 'theme/components/theme/ButtonFull'
+import Tooltip from 'theme/components/core/Tooltip'
 
 export default {
+  components: {
+    BaseCheckbox,
+    BaseSelect,
+    BaseInput,
+    ButtonFull,
+    Tooltip
+  },
+  mixins: [MyProfile],
+  computed: {
+    countryOptions () {
+      return this.countries.map((item) => {
+        return {
+          value: item.code,
+          label: item.name
+        }
+      })
+    }
+  },
+  methods: {
+    checkValidation () {
+      if (this.changePassword && this.addCompany) {
+        return this.$v.$invalid
+      } else if (this.changePassword && !this.addCompany) {
+        return this.$v.currentUser.$invalid || this.$v.password.$invalid || this.$v.rPassword.$invalid
+      } else if (!this.changePassword && this.addCompany) {
+        return this.$v.currentUser.$invalid || this.$v.userCompany.$invalid
+      } else {
+        return this.$v.currentUser.$invalid
+      }
+    }
+  },
   validations: {
     currentUser: {
       firstname: {
@@ -319,7 +429,7 @@ export default {
       },
       postcode: {
         required,
-        minLength: minLength(3)
+        minLength: minLength(5)
       },
       city: {
         required
@@ -329,79 +439,6 @@ export default {
         minLength: minLength(3)
       }
     }
-  },
-  data () {
-    return {
-      passType: {
-        oldPass: 'password',
-        pass: 'password',
-        repeatPass: 'password'
-      },
-      iconName: {
-        oldPass: 'visibility',
-        pass: 'visibility',
-        repeatPass: 'visibility'
-      }
-    }
-  },
-  methods: {
-    checkValidation () {
-      if (this.changePassword && this.addCompany) {
-        return this.$v.$invalid
-      } else if (this.changePassword && !this.addCompany) {
-        return this.$v.currentUser.$invalid || this.$v.password.$invalid || this.$v.rPassword.$invalid
-      } else if (!this.changePassword && this.addCompany) {
-        return this.$v.currentUser.$invalid || this.$v.userCompany.$invalid
-      } else {
-        return this.$v.currentUser.$invalid
-      }
-    },
-    togglePassType (name) {
-      if (this.passType[name] === 'password') {
-        this.passType[name] = 'text'
-        this.iconName[name] = 'visibility_off'
-      } else {
-        this.passType[name] = 'password'
-        this.iconName[name] = 'visibility'
-      }
-    }
-  },
-  components: {
-    ButtonFull
-  },
-  mixins: [coreComponent('blocks/MyAccount/MyProfile')]
+  }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '~theme/css/variables/colors';
-@import '~theme/css/helpers/functions/color';
-$color-hover: color(tertiary, $colors-background);
-$color-focus: color(black);
-
-.pass-container {
-  input[type=password], input[type=text] {
-    &:focus {
-      outline: none;
-      border-color: $color-focus;
-      transition: 0.3s all;
-    }
-  }
-
-  .icon {
-    right: 0;
-    top: 10px;
-
-    &:hover {
-      color: $color-hover;
-    }
-  }
-}
-
-.button-container {
-  @media (max-width: 1200px) {
-    margin-bottom: 10px;
-    margin-top: 15px;
-  }
-}
-</style>

@@ -1,4 +1,5 @@
 
+**!!! Extensions are depreciated, use [modules](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/api-modules/about-modules.md) instead**
 # Working with extensions
 
 Vue Storefront Core provides basic eCommerce features. Everything else should be available via extensions.
@@ -7,6 +8,8 @@ Vue Storefront Core provides basic eCommerce features. Everything else should be
 If you would like to extend your Vue Storefront instance with additional functionality you can certainly do that via adding your own extensions.  
 
 All extenstions are located in /src/extensions folder, each in its own directory.  
+
+If you want to make your own extension you should publish it as standalone npm package. The naming convention for Vue Storefront npm extensions is `vsf-{extension_name}` (see [example](https://www.npmjs.com/package/vsf-external-checkout?activeTab=readme) )
 
 In each extension folder there need to be an *index.js* file that serves as an entry point of your extension.  
 
@@ -35,19 +38,40 @@ The naming convention for the events is: `after-<module>-<action>` for example `
 If you want to provide some components for the themes please think of them as a mixins (you can add default HTML markup) so they can be styled and modified in themes.
 
 ## How to install the extension
-The enabled extensions must be declared within `config/local.json` file. Please take a look at the [default config](https://github.com/DivanteLtd/vue-storefront/blob/master/config/default.json) for a reference.
+The enabled extensions must be declared within `src/extensions/index.js` file. You can also declare theme-specific extensions in `src/{your_theme}/extensions/index.js`.
 
-You should just add your extension name to:
+You should just instantionate your extension adding it to the list:.
 
-```json
-    "registeredExtensions": ["custom_extension", "mailchimp-subscribe", "google-analytics"]
+
+```js
+export default [
+  require('src/extensions/custom_extension/index.js').default,
+  require('src/extensions/payment-cash-on-delivery/index.js').default,
+  require('src/extensions/payment-backend-methods/index.js').default,
+  require('src/extensions/mailchimp-subscribe/index.js').default,
+  require('src/extensions/google-analytics/index.js').default,
+
+  require('vue-storefront-stripe/index.js').default
+]
 ```
 
+## Creating a Payment Extension
+
+Payments are handled soley via a Payment Extension. This behaves and is created like the above base Extension, however it is also expected to catch and emit a few events for it to be a complete Payment Extension. Any of the payment handling logic, UI is handled soley via the Extension. For the most basic version of how a Payment Extension is the "src/extensions/cash-on-delivery".
+* The Payment Extension where applicable should catch the 'checkout-payment-method-changed' event, if the payment method code is the desired one, then you have the option to dynamically inject any components into the order review section on the checkout, (for example credit card input fields, payment method information etc).
+* You are required to catch the 'checkout-before-placeOrder' event and do any processing required for the payment method before placing the order.
+* You are required to emit the 'checkout-do-placeOrder' event with an optional payload to complete the placeorder process.
+* For your payment method to display, add it to the Payment Methods collection in storage. 'app.$store.state.payment.methods.push(paymentMethodConfig)'
+* Unregister any events when they are no longer required.
+* For clarity in growing extensions, payment extensions should be named clearly 'payment-{VENDOR}-{PAYMENT_METHOD}'
+
 ## Extensions list (docs for it under construction)
+* Stripe Payments
+* Cash On Delivery (a minimal but working payment extension demo)
 * Mailchimp Integration
 * Google Analytics Integration
 * [Droppoint shipping](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/extensions/droppoint-shipping.md)
-* [Example of custom extension](https://github.com/DivanteLtd/vue-storefront/tree/master/src/extensions/custom_extension) - can be used as a boilerplate
+* [Example of custom extension](https://github.com/DivanteLtd/vue-storefront/tree/master/src/extensions/template) - can be used as a boilerplate
 
 # Related
 * [Extending Vue Storefront API](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Extending%20vue-storefront-api.md)
